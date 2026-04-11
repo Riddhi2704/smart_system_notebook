@@ -23,7 +23,19 @@ const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState('all'); // all, pending, completed
   const [sortBy, setSortBy] = useState('dueDate');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchTasks();
@@ -126,6 +138,13 @@ const Dashboard = () => {
     <div className="dashboard-container">
       {/* 📌 SIDEBAR */}
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <button 
+          className="sidebar-close-btn" 
+          onClick={() => setIsSidebarOpen(false)}
+          style={{ display: window.innerWidth <= 1024 ? 'block' : 'none' }}
+        >
+          <X size={24} />
+        </button>
         <div className="sidebar-logo">
           <div className="logo-icon">
             <ClipboardList size={24} />
@@ -189,6 +208,12 @@ const Dashboard = () => {
       {/* 🚀 MAIN CONTENT */}
       <main className="main-content">
         <header className="navbar">
+          <button 
+            className="menu-toggle-btn" 
+            onClick={() => setIsSidebarOpen(true)}
+          >
+            <Menu size={24} />
+          </button>
           <div className="navbar-search">
             <input
               type="text"
@@ -480,6 +505,18 @@ const Dashboard = () => {
               <X size={16} />
             </button>
           </motion.div>
+        )}
+      </AnimatePresence>
+      {/* 🚀 SIDEBAR OVERLAY */}
+      <AnimatePresence>
+        {isSidebarOpen && window.innerWidth <= 1024 && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="sidebar-overlay"
+            onClick={() => setIsSidebarOpen(false)}
+          />
         )}
       </AnimatePresence>
     </div>
