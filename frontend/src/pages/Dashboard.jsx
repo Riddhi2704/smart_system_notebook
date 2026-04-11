@@ -172,6 +172,20 @@ const Dashboard = () => {
             <span className="badge-count">{tasks.length}</span>
           </button>
           <button
+            onClick={() => setActiveFilter('today')}
+            className={`sidebar-item ${activeFilter === 'today' ? 'active' : ''}`}
+          >
+            <Calendar size={20} />
+            <span>Today</span>
+          </button>
+          <button
+            onClick={() => setActiveFilter('week')}
+            className={`sidebar-item ${activeFilter === 'week' ? 'active' : ''}`}
+          >
+            <TrendingUp size={20} />
+            <span>This Week</span>
+          </button>
+          <button
             onClick={() => setActiveFilter('pending')}
             className={`sidebar-item ${activeFilter === 'pending' ? 'active' : ''}`}
           >
@@ -298,6 +312,8 @@ const Dashboard = () => {
               <div className="filter-group">
                 {[
                   { id: 'all', label: 'All Tasks', icon: <Hash size={16} /> },
+                  { id: 'today', label: 'Today', icon: <Calendar size={16} /> },
+                  { id: 'week', label: 'This Week', icon: <TrendingUp size={16} /> },
                   { id: 'pending', label: 'Pending', icon: <Clock size={16} /> },
                   { id: 'overdue', label: 'Overdue', icon: <AlertTriangle size={16} /> },
                   { id: 'completed', label: 'Completed', icon: <CheckCircle2 size={16} /> },
