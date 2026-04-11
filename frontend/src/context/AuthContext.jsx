@@ -22,11 +22,18 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      console.log('Attempting login for:', email);
       const response = await api.post('/auth/login', { email, password });
+      console.log('Login successful:', response.data.email);
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
       return { success: true };
     } catch (error) {
+      console.error('Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       return { 
         success: false, 
         message: error.response?.data?.message || 'Login failed' 

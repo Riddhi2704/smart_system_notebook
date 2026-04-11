@@ -10,22 +10,30 @@ const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
+    // 1. Validation
     if (!name || !email || !password) {
       res.status(400);
-      throw new Error('Please enter all fields');
+      throw new Error('Please enter all fields (name, email, password)');
     }
 
-    // Check if user exists
+    if (password.length < 6) {
+      res.status(400);
+      throw new Error('Password must be at least 6 characters long');
+    }
+
+    // 2. Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
+      console.log(`Registration failed: User already exists (${email})`);
       res.status(400);
-      throw new Error('User already exists');
+      throw new Error('User already exists with this email');
     }
 
-    // Create user
+    // 3. Create user
     const user = await User.create({ name, email, password });
 
     if (user) {
+      console.log(`New user registered: ${user.email}`);
       res.status(201).json({
         _id: user.id,
         name: user.name,
@@ -34,7 +42,7 @@ const registerUser = async (req, res, next) => {
       });
     } else {
       res.status(400);
-      throw new Error('Invalid user data');
+      throw new Error('Invalid user data received');
     }
   } catch (error) {
     next(error);
@@ -45,10 +53,27 @@ const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Check for user email
-    const user = await User.findOne({ email });
+    // 1. Validation
+    if (!email || !password) {
+      res.status(400);
+      throw new Error('Please provide both email and password');
+    }
 
-    if (user && (await user.comparePassword(password))) {
+    // 2. Find user
+    // We explicitly select +password in case it was set to select: false in schema (future proof)
+    const user = await User.findOne({ email }).select('+password');
+
+    if (!user) {
+      console.log(`Login attempt failed: User not found for email ${email}`);
+      res.status(401);
+      throw new Error('Invalid email or password');
+    }
+
+    // 3. Compare Password
+    const isMatch = await user.comparePassword(password);
+    
+    if (isMatch) {
+      console.log(`User logged in: ${user.email}`);
       res.json({
         _id: user.id,
         name: user.name,
@@ -56,6 +81,7 @@ const loginUser = async (req, res, next) => {
         token: generateToken(user._id),
       });
     } else {
+      console.log(`Login attempt failed: Incorrect password for ${email}`);
       res.status(401);
       throw new Error('Invalid email or password');
     }

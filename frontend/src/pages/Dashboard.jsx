@@ -55,7 +55,7 @@ const Dashboard = () => {
     const query = searchQuery.toLowerCase();
     const titleMatch = task.title.toLowerCase().includes(query);
     const descMatch = task.description?.toLowerCase().includes(query);
-    
+
     // Additional visibility filter for tabs
     if (activeFilter === 'pending') return task.status === 'pending' && (titleMatch || descMatch);
     if (activeFilter === 'completed') return task.status === 'completed' && (titleMatch || descMatch);
@@ -130,43 +130,43 @@ const Dashboard = () => {
           <div className="logo-icon">
             <ClipboardList size={24} />
           </div>
-          <span>SmartTask<br/><small style={{fontSize: '10px', opacity: 0.6}}>Management System</small></span>
+          <span>TaskMind<br /><small style={{ fontSize: '10px', opacity: 0.6 }}>intelligent task System</small></span>
         </div>
 
         <div className="sidebar-search">
           <Search size={16} />
-          <input 
-            type="text" 
-            placeholder="Search filters..." 
+          <input
+            type="text"
+            placeholder="Search filters..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
         <nav className="sidebar-nav">
-          <button 
-            onClick={() => setActiveFilter('all')} 
+          <button
+            onClick={() => setActiveFilter('all')}
             className={`sidebar-item ${activeFilter === 'all' ? 'active' : ''}`}
           >
             <LayoutDashboard size={20} />
             <span>All Tasks</span>
             <span className="badge-count">{tasks.length}</span>
           </button>
-          <button 
-            onClick={() => setActiveFilter('pending')} 
+          <button
+            onClick={() => setActiveFilter('pending')}
             className={`sidebar-item ${activeFilter === 'pending' ? 'active' : ''}`}
           >
             <Clock size={20} />
             <span>Pending Tasks</span>
-            <span className="badge-count" style={{background: '#F59E0B'}}>{pendingCount}</span>
+            <span className="badge-count" style={{ background: '#F59E0B' }}>{pendingCount}</span>
           </button>
-          <button 
-            onClick={() => setActiveFilter('completed')} 
+          <button
+            onClick={() => setActiveFilter('completed')}
             className={`sidebar-item ${activeFilter === 'completed' ? 'active' : ''}`}
           >
             <CheckCircle2 size={20} />
             <span>Completed Tasks</span>
-            <span className="badge-count" style={{background: '#22C55E'}}>{completedCount}</span>
+            <span className="badge-count" style={{ background: '#22C55E' }}>{completedCount}</span>
           </button>
         </nav>
 
@@ -190,9 +190,9 @@ const Dashboard = () => {
       <main className="main-content">
         <header className="navbar">
           <div className="navbar-search">
-            <input 
-              type="text" 
-              placeholder="Quick search anything..." 
+            <input
+              type="text"
+              placeholder="Quick search anything..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -204,8 +204,8 @@ const Dashboard = () => {
               <span>Add Task</span>
             </button>
 
-            <button 
-              className="btn-icon" 
+            <button
+              className="btn-icon"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               style={{ background: 'var(--bg-main)', borderRadius: '12px' }}
             >
@@ -231,8 +231,8 @@ const Dashboard = () => {
 
           <section className="stats-grid animate-slide-up" style={{ animationDelay: '0.1s' }}>
             {stats.map((stat, index) => (
-              <motion.div 
-                key={index} 
+              <motion.div
+                key={index}
                 className="stat-card"
                 whileHover={{ y: -8, boxShadow: 'var(--shadow-lg)' }}
               >
@@ -270,9 +270,9 @@ const Dashboard = () => {
 
               <div className="sort-group">
                 <span className="sort-label">Sort by:</span>
-                <select 
-                  className="sort-select" 
-                  value={sortBy} 
+                <select
+                  className="sort-select"
+                  value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                 >
                   <option value="dueDate">Nearest Due Date</option>
@@ -311,20 +311,18 @@ const Dashboard = () => {
                       transition={{ delay: index * 0.05 }}
                       key={task._id}
                       className={`task-card ${task.dueStatus?.includes('Overdue') ? 'overdue-highlight' : ''}`}
-                      style={{ 
-                        borderLeft: `5px solid ${
-                          task.dueStatus === 'Completed' ? '#3B82F6' : 
-                          task.dueStatus?.includes('Overdue') ? '#EF4444' : 
-                          task.dueStatus === 'Due Today' ? '#F59E0B' : '#22C55E'
-                        }`
+                      style={{
+                        borderLeft: `5px solid ${task.dueStatus === 'Completed' ? '#3B82F6' :
+                          task.dueStatus?.includes('Overdue') ? '#EF4444' :
+                            task.dueStatus === 'Due Today' ? '#F59E0B' : '#22C55E'
+                          }`
                       }}
                     >
                       <div className="task-card-header">
-                        <div className={`due-status-badge ${
-                          task.dueStatus === 'Completed' ? 'due-status-completed' :
+                        <div className={`due-status-badge ${task.dueStatus === 'Completed' ? 'due-status-completed' :
                           task.dueStatus?.includes('Overdue') ? 'due-status-overdue' :
-                          task.dueStatus === 'Due Today' ? 'due-status-today' : 'due-status-upcoming'
-                        }`}>
+                            task.dueStatus === 'Due Today' ? 'due-status-today' : 'due-status-upcoming'
+                          }`}>
                           {task.dueStatus?.includes('Overdue') && <AlertTriangle size={12} />}
                           {task.dueStatus === 'Due Today' && <Clock size={12} />}
                           {task.dueStatus?.includes('Due in') && <RefreshCw size={12} />}
@@ -335,24 +333,24 @@ const Dashboard = () => {
                           {task.priority || 'Medium'}
                         </div>
                       </div>
-                      
+
                       <h3>{task.title}</h3>
                       <p>{task.description}</p>
-                      
+
                       <div className="task-card-footer">
                         <div className="due-date">
                           <Calendar size={14} />
                           <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : 'No date'}</span>
                         </div>
                         <div className="task-card-actions">
-                          <button 
-                            className="btn-icon" 
+                          <button
+                            className="btn-icon"
                             onClick={() => handleUpdateTask(task._id, { status: task.status === 'completed' ? 'pending' : 'completed' })}
                             style={{ color: task.status === 'completed' ? '#3B82F6' : 'inherit' }}
                           >
                             <CheckCircle2 size={18} strokeWidth={task.status === 'completed' ? 3 : 2} />
                           </button>
-                          <button 
+                          <button
                             className="btn-icon"
                             onClick={() => {
                               setEditingTask(task);
@@ -385,7 +383,7 @@ const Dashboard = () => {
       <AnimatePresence>
         {isAdding && (
           <div className="modal-overlay" onClick={() => { setIsAdding(false); setEditingTask(null); }}>
-            <motion.div 
+            <motion.div
               className="modal-content"
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -402,9 +400,9 @@ const Dashboard = () => {
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label className="form-label">Task Title</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
+                  <input
+                    type="text"
+                    className="form-input"
                     placeholder="e.g. Design System Update"
                     value={newTask.title}
                     onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
@@ -413,8 +411,8 @@ const Dashboard = () => {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Description</label>
-                  <textarea 
-                    className="form-textarea" 
+                  <textarea
+                    className="form-textarea"
                     placeholder="Describe the task details..."
                     value={newTask.description}
                     onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
@@ -423,16 +421,16 @@ const Dashboard = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div className="form-group">
                     <label className="form-label">Due Date</label>
-                    <input 
-                      type="date" 
-                      className="form-input" 
+                    <input
+                      type="date"
+                      className="form-input"
                       value={newTask.dueDate}
                       onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
                     />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Priority</label>
-                    <select 
+                    <select
                       className="form-select"
                       value={newTask.priority}
                       onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
@@ -456,17 +454,17 @@ const Dashboard = () => {
       {/* 🚀 NOTIFICATION TOAST */}
       <AnimatePresence>
         {notification && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            style={{ 
-              position: 'fixed', 
-              bottom: '40px', 
-              right: '40px', 
-              background: 'var(--primary)', 
-              color: 'white', 
-              padding: '16px 32px', 
+            style={{
+              position: 'fixed',
+              bottom: '40px',
+              right: '40px',
+              background: 'var(--primary)',
+              color: 'white',
+              padding: '16px 32px',
               borderRadius: '16px',
               fontWeight: 700,
               boxShadow: 'var(--shadow-lg)',
