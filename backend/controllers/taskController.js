@@ -43,6 +43,8 @@ const getTasks = async (req, res, next) => {
       } else if (filter === 'overdue') {
         query.dueDate = { $lt: now };
         query.status = 'pending';
+      } else if (filter === 'pending') {
+        query.status = 'pending';
       } else if (filter === 'completed') {
         query.status = 'completed';
       }

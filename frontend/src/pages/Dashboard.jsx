@@ -128,10 +128,10 @@ const Dashboard = () => {
   }).length;
 
   const stats = [
-    { label: 'Total Tasks', value: tasks.length, icon: <LayoutDashboard size={24} />, color: '#4F46E5' },
-    { label: 'Pending', value: pendingCount, icon: <Clock size={24} />, color: '#F59E0B' },
-    { label: 'Completed', value: completedCount, icon: <CheckCircle2 size={24} />, color: '#22C55E' },
-    { label: 'Overdue', value: overdueCount, icon: <AlertTriangle size={24} />, color: '#EF4444' },
+    { id: 'all', label: 'Total Tasks', value: tasks.length, icon: <LayoutDashboard size={24} />, color: '#4F46E5' },
+    { id: 'pending', label: 'Pending Tasks', value: pendingCount, icon: <Clock size={24} />, color: '#F59E0B' },
+    { id: 'completed', label: 'Completed Tasks', value: completedCount, icon: <CheckCircle2 size={24} />, color: '#22C55E' },
+    { id: 'overdue', label: 'Overdue Tasks', value: overdueCount, icon: <AlertTriangle size={24} />, color: '#EF4444' },
   ];
 
   return (
@@ -176,15 +176,23 @@ const Dashboard = () => {
             className={`sidebar-item ${activeFilter === 'pending' ? 'active' : ''}`}
           >
             <Clock size={20} />
-            <span>Pending Tasks</span>
+            <span>Pending</span>
             <span className="badge-count" style={{ background: '#F59E0B' }}>{pendingCount}</span>
+          </button>
+          <button
+            onClick={() => setActiveFilter('overdue')}
+            className={`sidebar-item ${activeFilter === 'overdue' ? 'active' : ''}`}
+          >
+            <AlertTriangle size={20} />
+            <span>Overdue</span>
+            <span className="badge-count" style={{ background: '#EF4444' }}>{overdueCount}</span>
           </button>
           <button
             onClick={() => setActiveFilter('completed')}
             className={`sidebar-item ${activeFilter === 'completed' ? 'active' : ''}`}
           >
             <CheckCircle2 size={20} />
-            <span>Completed Tasks</span>
+            <span>Completed</span>
             <span className="badge-count" style={{ background: '#22C55E' }}>{completedCount}</span>
           </button>
         </nav>
@@ -258,8 +266,14 @@ const Dashboard = () => {
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
-                className="stat-card"
+                className={`stat-card ${activeFilter === stat.id ? 'active' : ''}`}
+                onClick={() => setActiveFilter(stat.id)}
                 whileHover={{ y: -8, boxShadow: 'var(--shadow-lg)' }}
+                style={{ 
+                  cursor: 'pointer',
+                  border: activeFilter === stat.id ? `2px solid ${stat.color}` : '1px solid var(--border-color)',
+                  boxShadow: activeFilter === stat.id ? `0 10px 25px ${stat.color}25` : 'var(--shadow-sm)'
+                }}
               >
                 <div className="stat-icon-wrapper" style={{ background: `${stat.color}15`, color: stat.color }}>
                   {stat.icon}
@@ -268,6 +282,13 @@ const Dashboard = () => {
                   <span className="stat-value">{stat.value}</span>
                   <span className="stat-label">{stat.label}</span>
                 </div>
+                {activeFilter === stat.id && (
+                  <motion.div 
+                    layoutId="activeGlow"
+                    className="active-glow"
+                    style={{ background: stat.color }}
+                  />
+                )}
               </motion.div>
             ))}
           </section>
@@ -277,8 +298,7 @@ const Dashboard = () => {
               <div className="filter-group">
                 {[
                   { id: 'all', label: 'All Tasks', icon: <Hash size={16} /> },
-                  { id: 'today', label: 'Today', icon: <Calendar size={16} /> },
-                  { id: 'week', label: 'This Week', icon: <TrendingUp size={16} /> },
+                  { id: 'pending', label: 'Pending', icon: <Clock size={16} /> },
                   { id: 'overdue', label: 'Overdue', icon: <AlertTriangle size={16} /> },
                   { id: 'completed', label: 'Completed', icon: <CheckCircle2 size={16} /> },
                 ].map((f) => (
