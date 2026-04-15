@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Eye, EyeOff, ClipboardList, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../api';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -12,6 +13,11 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
+
+    // 🚀 Server Wake-up (Fix for Render Cold Start)
+    React.useEffect(() => {
+        api.get('/health').catch(() => {}); // Silent ping
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

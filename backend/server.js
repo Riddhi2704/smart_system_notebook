@@ -19,6 +19,9 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch((err) => console.log('MongoDB Connection Error:', err));
 
+// Health Check Route
+app.get('/api/health', (req, res) => res.status(200).json({ status: 'ok' }));
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tasks', require('./routes/tasks'));

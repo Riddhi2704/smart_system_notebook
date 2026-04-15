@@ -116,23 +116,25 @@ const Dashboard = () => {
     }
   };
 
-  const completedCount = tasks.filter(t => t.status === 'completed').length;
-  const pendingCount = tasks.filter(t => t.status === 'pending').length;
-  const overdueCount = tasks.filter(t => {
-    if (t.status === 'completed' || !t.dueDate) return false;
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const due = new Date(t.dueDate);
-    due.setHours(0, 0, 0, 0);
-    return due < now;
-  }).length;
+  const stats = React.useMemo(() => {
+    const completedCount = tasks.filter(t => t.status === 'completed').length;
+    const pendingCount = tasks.filter(t => t.status === 'pending').length;
+    const overdueCount = tasks.filter(t => {
+      if (t.status === 'completed' || !t.dueDate) return false;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const due = new Date(t.dueDate);
+      due.setHours(0, 0, 0, 0);
+      return due < now;
+    }).length;
 
-  const stats = [
-    { id: 'all', label: 'Total Tasks', value: tasks.length, icon: <LayoutDashboard size={24} />, color: '#4F46E5' },
-    { id: 'pending', label: 'Pending Tasks', value: pendingCount, icon: <Clock size={24} />, color: '#F59E0B' },
-    { id: 'completed', label: 'Completed Tasks', value: completedCount, icon: <CheckCircle2 size={24} />, color: '#22C55E' },
-    { id: 'overdue', label: 'Overdue Tasks', value: overdueCount, icon: <AlertTriangle size={24} />, color: '#EF4444' },
-  ];
+    return [
+      { id: 'all', label: 'Total Tasks', value: tasks.length, icon: <LayoutDashboard size={24} />, color: '#4F46E5' },
+      { id: 'pending', label: 'Pending Tasks', value: pendingCount, icon: <Clock size={24} />, color: '#F59E0B' },
+      { id: 'completed', label: 'Completed Tasks', value: completedCount, icon: <CheckCircle2 size={24} />, color: '#22C55E' },
+      { id: 'overdue', label: 'Overdue Tasks', value: overdueCount, icon: <AlertTriangle size={24} />, color: '#EF4444' },
+    ];
+  }, [tasks]);
 
   return (
     <div className="dashboard-container">
@@ -169,7 +171,7 @@ const Dashboard = () => {
           >
             <LayoutDashboard size={20} />
             <span>All Tasks</span>
-            <span className="badge-count">{tasks.length}</span>
+            <span className="badge-count">{stats[0].value}</span>
           </button>
           <button
             onClick={() => setActiveFilter('today')}
@@ -191,7 +193,7 @@ const Dashboard = () => {
           >
             <Clock size={20} />
             <span>Pending</span>
-            <span className="badge-count" style={{ background: '#F59E0B' }}>{pendingCount}</span>
+            <span className="badge-count" style={{ background: '#F59E0B' }}>{stats[1].value}</span>
           </button>
           <button
             onClick={() => setActiveFilter('overdue')}
@@ -199,7 +201,7 @@ const Dashboard = () => {
           >
             <AlertTriangle size={20} />
             <span>Overdue</span>
-            <span className="badge-count" style={{ background: '#EF4444' }}>{overdueCount}</span>
+            <span className="badge-count" style={{ background: '#EF4444' }}>{stats[3].value}</span>
           </button>
           <button
             onClick={() => setActiveFilter('completed')}
@@ -207,7 +209,7 @@ const Dashboard = () => {
           >
             <CheckCircle2 size={20} />
             <span>Completed</span>
-            <span className="badge-count" style={{ background: '#22C55E' }}>{completedCount}</span>
+            <span className="badge-count" style={{ background: '#22C55E' }}>{stats[2].value}</span>
           </button>
         </nav>
 
@@ -369,7 +371,7 @@ const Dashboard = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: Math.min(index * 0.05, 0.5) }}
                       key={task._id}
                       className={`task-card ${task.dueStatus?.includes('Overdue') ? 'overdue-highlight' : ''}`}
                       style={{

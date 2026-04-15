@@ -2,9 +2,7 @@ const mongoose = require('mongoose');
 const Task = require('../models/Task');
 
 // 🚀 HELPER FUNCTION FOR DYNAMIC DUE STATUS
-const calculateDueStatus = (task) => {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
+const calculateDueStatus = (task, now) => {
   const due = new Date(task.dueDate);
   due.setHours(0, 0, 0, 0);
 
@@ -27,11 +25,10 @@ const getTasks = async (req, res, next) => {
   try {
     const { filter, sort } = req.query;
     let query = { userId: new mongoose.Types.ObjectId(req.user.id) };
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
 
     if (filter) {
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-
       if (filter === 'today') {
         const tomorrow = new Date(now);
         tomorrow.setDate(now.getDate() + 1);
@@ -55,9 +52,9 @@ const getTasks = async (req, res, next) => {
       sortOptions = { dueDate: 1 };
     }
 
-    let tasks = await Task.find(query).sort(sortOptions);
+    let tasks = await Task.find(query).sort(sortOptions).lean();
 
-    // 🚀 IN-MEMORY PRIORITY SORT (Robust fallback for custom weighted sorting)
+    // 🚀 OPTIMIZED PRIORITY SORT
     if (sort === 'priority') {
       const priorityWeights = { 'High': 3, 'Medium': 2, 'Low': 1 };
       tasks.sort((a, b) => {
@@ -65,19 +62,18 @@ const getTasks = async (req, res, next) => {
         const weightB = priorityWeights[b.priority] || 0;
         
         if (weightA !== weightB) {
-          return weightB - weightA; // High (3) to Low (1)
+          return weightB - weightA;
         }
         
-        // Secondary sort: Due Date (Nearest first)
         return new Date(a.dueDate) - new Date(b.dueDate);
       });
     }
 
-    const tasksWithStatus = tasks.map(task => {
-      const taskObj = (typeof task.toObject === 'function') ? task.toObject() : task;
-      taskObj.dueStatus = calculateDueStatus(taskObj);
-      return taskObj;
-    });
+    // Map status in one pass
+    const tasksWithStatus = tasks.map(task => ({
+      ...task,
+      dueStatus: calculateDueStatus(task, now)
+    }));
 
     res.json(tasksWithStatus);
   } catch (error) {
@@ -108,7 +104,9 @@ const createTask = async (req, res, next) => {
     });
 
     const taskObj = task.toObject();
-    taskObj.dueStatus = calculateDueStatus(taskObj);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    taskObj.dueStatus = calculateDueStatus(taskObj, now);
 
     res.status(201).json(taskObj);
   } catch (error) {
@@ -133,7 +131,9 @@ const updateTask = async (req, res, next) => {
     const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
     
     const taskObj = updatedTask.toObject();
-    taskObj.dueStatus = calculateDueStatus(taskObj);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    taskObj.dueStatus = calculateDueStatus(taskObj, now);
 
     res.json(taskObj);
   } catch (error) {
